@@ -104,11 +104,129 @@ public class Algorithm {
         return Math.max(pre2,pre1);
     }
 
+    /**
+     * 环形房屋抢劫问题
+     * @param nums
+     * @return
+     */
+    public int rob(int[] nums) {
+        if (nums == null || nums.length == 0) {
+            return 0;
+        }
+        int n = nums.length;
+        if (n == 1) {
+            return nums[0];
+        }
+        //处理环形情况，将环形问题分解为两个线性子问题，分别排除首或尾元素。
+        return Math.max(rob(nums, 0, n - 2), rob(nums, 1, n - 1));
+    }
+
+    private int rob(int[] nums, int first, int last) {
+        int pre3 = 0, pre2 = 0, pre1 = 0;
+        for (int i = first; i <= last; i++) {
+            //动态规划核心逻辑
+            int cur = Math.max(pre3, pre2) + nums[i];
+            pre3 = pre2;
+            pre2 = pre1;
+            pre1 = cur;
+        }
+        return Math.max(pre2, pre1);
+    }
+    public static long derangementOptimized(int n) {
+        if (n == 0) return 1;
+        if (n == 1) return 0;
+
+        long a = 1; // D(0)
+        long b = 0; // D(1)
+        long c = 0;
+
+        for (int i = 2; i <= n; i++) {
+            c = (i - 1) * (a + b);
+            a = b;
+            b = c;
+        }
+
+        return b;
+    }
+    /**
+     * 信封错排列问题
+     * 递归方法
+     * @param num
+     * @return
+     */
+    public int derangementRecursive(int num) {
+        if (num ==0){
+            return 1;
+        }
+        if (num ==1){
+            return 0;
+        }
+
+        return (num-1)*(derangementRecursive(num-1)+derangementRecursive(num-2));
+
+    }
+
+    public long derangementRecursive2(int num){
+        //空集合视为一种排序
+        if (num ==0){
+            return 1;
+        }
+        //只有一个元素无法错位
+        if (num ==1){
+            return 0;
+        }
+        //必须+1以包含0~ num所有索引
+         long[] dp = new long[num + 1];
+         dp[0] = 1;
+         dp[1] = 0;
+         for (int i = 2; i <= num; i++) {
+             dp[i] = (i - 1) * (dp[i - 1] + dp[i - 2]);
+         }
+         return  dp[num];
+    }
+    public int minPathSum(int[][] grid) {
+
+        int m = grid.length;
+        int n = grid[0].length;
+        int[][] dp = new int[m][n];
+        dp[0][0] = grid[0][0];
+        for (int i = 1; i < m; i++) {
+            dp[i][0] = dp[i - 1][0] + grid[i][0];
+        }
+        for (int j = 1; j < n; j++) {
+            dp[0][j] = dp[0][j - 1] + grid[0][j];
+        }
+        for (int i = 1; i < m; i++) {
+            for (int j = 1; j < n; j++) {
+                dp[i][j] = Math.min(dp[i - 1][j], dp[i][j - 1]) + grid[i][j];
+            }
+        }
+        return dp[m - 1][n - 1];
+    }
+    public int minPathSums(int[][] grid) {
+        if (grid.length == 0 || grid[0].length == 0) {
+            return 0;
+        }
+        int m = grid.length, n = grid[0].length;
+        int[] dp = new int[n];
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (i == 0) {
+                    dp[j] = dp[j - 1];
+                } else {
+                    dp[j] = Math.min(dp[j - 1], dp[j]);
+                }
+                dp[j] += grid[i][j];
+            }
+        }
+        return dp[n - 1];
+    }
+
     public static void main(String[] args) {
 //        System.out.println(new Algorithm().diffWaysToCompute("2*3-4*5"));
 //        System.out.println(new Algorithm().climbStairs(6));
 //        System.out.println(new Algorithm().click(6));
-        final int[] ints = {1,12, 3, 21,12};
+        final int[] ints = {1,12, 3, 21,12,23,46};
         System.out.println(new Algorithm().houseRobber(ints));
     }
 }
